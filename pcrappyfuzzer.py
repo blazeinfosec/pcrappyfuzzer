@@ -8,7 +8,7 @@
 #
 # written by Julio Cesar Fort, Wildfire Labs /// Blaze Information Security
 #
-# Copyright 2017, Blaze Information Security
+# Copyright 2016-2017, Blaze Information Security
 # https://www.blazeinfosec.com
 
 import scapy.all as scapy
