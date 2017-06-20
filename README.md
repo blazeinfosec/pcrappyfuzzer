@@ -18,3 +18,10 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 
 Copyright 2016-2017, Blaze Information Security
 https://www.blazeinfosec.com
+
+
+## Kudos
+
+Thanks to the talented folks of [Hackerstrip](http://www.hackerstrip.com) for the art used in our blog post.
+
+![Burning PCAPs](images/wizard_pcap.png)
