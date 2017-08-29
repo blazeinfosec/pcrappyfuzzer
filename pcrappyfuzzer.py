@@ -19,6 +19,7 @@ import random
 import time
 import argparse
 import os
+import sys
 
 VERBOSE = False
 PCAP_LOCATION = './test.pcap'
@@ -35,14 +36,13 @@ def mutate(payload):
     try:
         radamsa = [radamsa_bin, '-n', '1', '-']
         p = Popen(radamsa, stdin=PIPE, stdout=PIPE)
-        p.stdin.write(payload)
-        p.stdin.close()
-        p.wait()
-        mutated_data = p.stdout.read()
+        mutated_data = p.communicate(payload)[0]
     except:
-        print "'radamsa' command line error.Is it installed?"
-        exit(1)
+        print "Could not execute 'radamsa'."
+        sys.exit(1)
+
     return mutated_data
+
 
 def log_events(log_info, type_event):
     log_msg = "[" + time.ctime() + "]" + "\n" + log_info
@@ -71,15 +71,18 @@ def log_events(log_info, type_event):
 def main():
     global PCAP_LOCATION, HOST, PORT, FUZZ_FACTOR
     if not os.geteuid()==0:
-        print "Please run the script as sudo"
-        exit(1)
+        print "Please run the script as root"
+        sys.exit(1)
+
     arg=argparse.ArgumentParser(description="A very simple mash-up of Scapy + radamsa to extract data from pcap and perform fuzzing ad infinitum.")
     arg.add_argument("-H", action="store",dest="host", help="Destionation IP - Default: 127.0.0.1")
     arg.add_argument("-p", action="store", dest="port", help="Destionation Port - Port Default: 443")
     arg.add_argument("-f", action="store", dest="file", help="Input File Location")
     arg.add_argument("-z", action="store", dest="fuzz", help="Fuzz Factor - Default: 50.0")
     arg.add_argument("-v", action="version", version="%(prog)s 1.0")
+    
     result=arg.parse_args()
+    
     if result.host:
         HOST=result.host
     if result.port:
