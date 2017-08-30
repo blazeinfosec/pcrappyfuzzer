@@ -1,6 +1,6 @@
 ## pcrappyfuzzer
 
-pcrappyfuzzer.py: a very simple mash-up of Scapy + radamsa to extract data from a PCAP file and perform quick 'n dirty fuzzing ad infinitum.
+pcrappyfuzzer.py: a very simple mash-up of Scapy + [radamsa](https://github.com/aoh/radamsa) to extract data from a PCAP file and perform quick 'n dirty fuzzing ad infinitum.
 
 Originally written for a penetration testing engagement, but modified
 to support the blog post "Fuzzing proprietary protocols with Scapy,
