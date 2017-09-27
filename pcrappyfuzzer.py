@@ -11,7 +11,7 @@
 # Copyright 2016-2017, Blaze Information Security
 # https://www.blazeinfosec.com
 
-import scapy.all as scapy
+
 from subprocess import Popen, PIPE
 import ssl
 import socket
@@ -20,6 +20,15 @@ import time
 import argparse
 import os
 import sys
+import logging
+import time
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+try:
+    import scapy.all as scapy
+except ImportError:
+    print "[!] 'scapy' module not found."
+    exit(1)
+
 
 VERBOSE = False
 PCAP_LOCATION = './test.pcap'
@@ -76,6 +85,7 @@ def main():
     arg.add_argument("-p", action="store", dest="port", help="Destination Port - Port Default: 443")
     arg.add_argument("-f", action="store", dest="file", help="Input File Location")
     arg.add_argument("-z", action="store", dest="fuzz", help="Fuzz Factor - Default: 50.0")
+    arg.add_argument("-s", action="store_true", dest="ssl", default=False, help="Enables SSL")
     arg.add_argument("-v", action="version", version="%(prog)s 1.0")
     
     result = arg.parse_args()
@@ -83,9 +93,17 @@ def main():
     if result.host:
         HOST=result.host
     if result.port:
-        PORT=result.port
+        try:
+            PORT=int(result.port)
+        except ValueError:
+            print "[!] Option 'port' should be integer"
+            exit(1)
     if result.fuzz:
-        FUZZ_FACTOR=result.fuzz
+        try:
+            FUZZ_FACTOR=int(result.fuzz)
+        except ValueError:
+            print "[!] Option 'fuzz' should be integer"
+            exit(1)
     if result.file:
         PCAP_LOCATION=result.file
     if not os.path.exists(PCAP_LOCATION):
@@ -142,8 +160,9 @@ def main():
             fuzz_iterations += 1
             sockfd = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sockfd.settimeout(5)
-            ssl_sockfd = ssl.wrap_socket(sockfd)
-            ssl_sockfd.connect((HOST, PORT))
+            if result.ssl:
+                sockfd = ssl.wrap_socket(sockfd)
+            sockfd.connect((HOST, PORT))
 
             for packet in packets_list:
                 payload = packet[1]
@@ -153,8 +172,8 @@ def main():
                 iterations_str += "\n" + "--- Payload ---\n" + payload + "\n"
                 print payload
 
-                ssl_sockfd.send(payload)
-                received_buffer = ssl_sockfd.recv(2048)
+                sockfd.send(payload)
+                received_buffer = sockfd.recv(2048)
 
                 iterations_str += "\n" + "--- Received ---\n" + received_buffer + "\n"
                 print received_buffer
@@ -168,6 +187,7 @@ def main():
             print error_str
             log_str = error_str + '\n' + iterations_str
             log_events(log_str, "error")
+            time.sleep(10)
 
 
 if __name__ == '__main__':
