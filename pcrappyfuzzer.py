@@ -27,6 +27,7 @@ try:
     import scapy.all as scapy
 except ImportError:
     print "[!] 'scapy' module not found."
+    exit(1)
 
 
 VERBOSE = False
